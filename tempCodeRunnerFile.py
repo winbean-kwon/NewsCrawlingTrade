@@ -1,1 +1,1 @@
-search_box.send_keys(Keys.RETURN)
+
