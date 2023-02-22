@@ -1,82 +1,141 @@
-from collections import Counter
-from collections import defaultdict
-from scipy.sparse import csr_matrix
-import numpy as np
+from newspaper import Article
+from konlpy.tag import Kkma
+from konlpy.tag import Twitter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import normalize
+import numpy as np
 
-def scan_vocabulary(sents, tokenize, min_count=2):
-    for sent in sents:
-        for w in tokenize(sent):
-            counter = Counter(w)
-
-    for w,c in counter.items():
-        if c >= min_count:
-            counter = {w:c}
-
-    for w, _ in sorted(counter.items(), key=lambda x:-x[1]): # _ 사용한 이유? 무시 or 마지막 값 -> 없어도 되나? 
-        idx_to_vocab = w        
+class SentenceTokenizer(object):
+    def __init__(self):
+        self.kkma = Kkma()
+        self.twitter = Twitter()
+        self.stopwords = ['중인', '만큼', '마찬가지', '배고프다']
     
-    for idx, vocab in enumerate(idx_to_vocab) :
-        vocab_to_idx = {vocab:idx}
+    def url2sentences(self,url):
+        article = Article(url, language='ko')
+        article.download()
+        article.parse()
+        sentences = self.kkma.sentences(article.text)
+
+        for idx in range(0, len(sentences)):
+            if len(sentences[idx]) <= 10:
+                sentences[idx-1] += (' ' + sentences[idx])
+                sentences[idx] = ''
+
+        return sentences
+
+    def text2sentences(self, text):
+        sentences = self.kkma.sentences(text)
+        for idx in range(0, len(sentences)):
+            if len(sentences[idx]) <= 10:
+                sentences[idx-1] += (' ' + sentences[idx])
+                sentences[idx] = ''
+        
+        return sentences
+
+    def get_nouns(self, sentences):
+            nouns = []
+            for sentence in sentences:
+                if sentence is not '':
+                    nouns.append(' '.join([noun for noun in self.twitter.nouns(str(sentence)) if noun not in self.stopwords and len(noun) > 1]))
+            
+            return nouns
+
+
+# sentences = ['아 배고프다 그래서 라면이 먹고싶네', '심심하다 그래서 게임이 하고싶다']
+# for idx in range(0, len(sentences)):
+#     if len(sentences[idx]) <= 10:
+#         sentences[idx-1] += (' ' + sentences[idx])
+#         sentences[idx] = ''
     
-    return idx_to_vocab, vocab_to_idx
+# print(sentences)
 
+class GraphMatrix(object):
+    def __init__(self):
+        self.tfidf = TfidfVectorizer()
+        self.cnt_vec = CountVectorizer()
+        self.graph_sentence = []
 
-def cooccurrence(tokens, vocab_to_idx, window=2, min_cooccurrence=2):
-    counter = defaultdict(int)
-    for s, tokens_i in enumerate(tokens):
-        for w in tokens_i :
-            if w in vocab_to_idx :
-                vocabs = vocab_to_idx[w]
+    def build_sent_graph(self,sentence):
+        tfidf_mat = self.tfidf.fit_transform(sentence).toarray()
+        self.graph_sentence = np.dot(tfidf_mat, tfidf_mat.T)
+        return self.graph_sentence
 
-    n = len(vocabs)
-    for i, v in enumerate(vocabs):
-        if window <= 0:
-            b, e = 0, n
-        else: 
-            b = max(0, i - window)
-            e = min(i + window, n)
-        for j in range(b, e):
-            if i == j:
-                continue
-            counter[(v, vocabs[j])] += 1
-            counter[(vocabs[j], v)] += 1
+    def build_words_graph(self, sentence):
+        cnt_vec_mat = normalize(self.cnt_vec.fit_transform(sentence).toarray().astype(float), axis = 0)
+        vocab = self.cnt_vec.vocabulary_
+        return np.dot(cnt_vec_mat.T, cnt_vec_mat), {vocab[word] : word for word in vocab}
 
-    for k, v in counter.items() :
-        if v >= min_cooccurrence:
-            counter = {k:v}            
-    n_vocabs = len(vocab_to_idx)
+class Rank(object):
+    def get_ranks(self, graph, d=0.85):
+        A = graph
+        matrix_size = A.shape[0]
+        for id in range(matrix_size):
+            A[id, id] = 0
+            link_sum = np.sum(A[:][id])
+            if link_sum != 0:
+                A[:, id] /= link_sum
+            A[:, id] *= -d
+            A[id, id] = 1
 
-    return dict_to_mat(counter, n_vocabs, n_vocabs)
+        B = (1-d) * np.ones((matrix_size, 1))
+        ranks = np.linalg.solve(A, B)
+        return {idx: r[0] for idx, r in enumerate(ranks)}
 
+class TextRank(object):
+    def __init__(self, text):
+        self.sent_tokenize = SentenceTokenizer()
 
-def dict_to_mat(d, n_rows, n_cols):
-    rows, cols, data = [], [], []
-    for (i, j), v in d.items():
-        rows.append(i)
-        cols.append(j)
-        data.append(v)
-    
-    return csr_matrix((data, (rows, cols)), shape = (n_rows, n_cols))
+        if text[:5] in ('http:', 'https'):
+            self.sentences = self.sent_tokenize.url2sentences(text)
+        else:
+            self.sentences = self.sent_tokenize.text2sentences(text)
 
-def word_graph(sents, tokenize=None, min_count=2, window=2, min_cooccurrence=2):
-    idx_to_vocab, vocab_to_idx = scan_vocabulary(sents, tokenize, min_count)
-    for sent in sents:
-        tokens = tokenize(sent)
-    g = cooccurrence(tokens, vocab_to_idx, window, min_cooccurrence, verbose)
+        self.nouns = self.sent_tokenize.get_nouns(self.sentences)
+        
+        self.graph_matrix = GraphMatrix()
+        self.sent_graph = self.graph_matrix.build_sent_graph(self.nouns)
+        self.words_graph, self.idx2word = self.graph_matrix.build_words_graph(self.nouns)
 
-    return g, idx_to_vocab
+        self.rank = Rank()
+        self.sent_rank_idx = self.rank.get_ranks(self.sent_graph)
+        self.sorted_sent_rank_idx = sorted(self.sent_rank_idx, key=lambda k: self.sent_rank_idx[k], reverse= True)
 
-def pagerank(x, df=0.85, max_iter=30):
-    assert 0 < df < 1
+        self.word_Rank_idx = self.rank.get_ranks(self.words_graph)
+        self.sorted_word_rank_idx = sorted(self.word_rank_idx, key=lambda k: self.word_rank_idx[k], reverse=True)
 
-    #initialize
-    A = normalize(x, axis=0, norm='l1')
-    R = np.ones(A.shape[0]).reshape(-1,1)
-    bias = (1 - df) * np.ones(A.shape[0]).reshape(-1,1)
+    def summarize(self, sent_num=3):
+        summary = []
+        index=[]
+        for idx in self.sorted_sent_rank_idx[:sent_num]:
+            index.append(idx)
+        
+        index.sort()
+        for idx in index:
+            summary.append(self.sentences[idx])
 
-    #iteration
-    for _ in range(max_iter):
-        R = df * (A * R) + bias
+        return summary
 
-    return R
+    def keywords(self, word_num=10):
+        rank = Rank()
+        rank_idx = rank.get_ranks(self.words_graph)
+        sorted_rank_idx = sorted(rank_idx, key=lambda k: rank_idx[k], reverse=True)
+
+        keywords = []
+        index=[]
+        for idx in sorted_rank_idx[:word_num]:
+            index.append(idx)
+
+        #index.sort()
+        for idx in index:
+            keywords.append(self.idx2word[idx])
+
+        return keywords
+
+url = 'http://v.media.daum.net/v/20170611192209012?rcmd=r'
+textrank = TextRank(url)
+for row in textrank.summarize(3):
+    print(row)
+    print()
+print('keywords :',textrank.keywords())
