@@ -17,7 +17,7 @@ sleep(5)
 # search_box = driver.find_element_by_xpath('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input')
 
 search_box = driver.find_element(By.XPATH, '/html/body/div[3]/div/main/div[2]/article/div/div[2]/div[2]/aside/nsdq-right-rail-desktop/div/div[1]/div/div[1]/form/div/div[2]/input')
-search_box.send_keys('check')
+search_box.send_keys('use')
 search_box.send_keys(Keys.RETURN)
 
 driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select').click()
@@ -41,16 +41,6 @@ if title_text not in duplicate_check:
     writer.writerow([title_text])
 
 while True:
-  pass
+  input()
 
-
-
-# elements = driver.find_elements_by_xpath('//*[@id="rso"]/div[*]/div/div[1]/a/h3/span')
-
-# for element in elements:
-#   print(element.text)
-#   print(element.text, file=open('gorio.txt', 'w', encoding='utf-8'))
-
-# sleep(3)
-# driver.close()
 
