@@ -41,7 +41,7 @@ while True :
     print(f'new news: {title_text}')
   else:
     print('same news', i)
-    i += 1  
+    i += 1
   
   sleep(3) 
   driver.get(url='https://www.nasdaq.com/')
