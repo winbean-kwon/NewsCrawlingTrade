@@ -15,6 +15,7 @@ class trBot:
             pprint.pprint(buy)
 
             return True
+        
         except:
             print("매수 실패")
 
@@ -30,6 +31,8 @@ class trBot:
             pprint.pprint(sell)
 
             return True
+        
         except:
             print("매도 실패")
+            
             return False
