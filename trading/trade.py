@@ -1,17 +1,35 @@
 from object import broker
 import pprint
 
-buy = broker.create_limit_buy_order(
-    symbol = "TSLA",
-    price = 30,
-    quantity = 5
-)
+class trBot:
+    def __init__(self):
+        print('테스트')
+    
+    def orderMarketPrice(self, code, q):
+        #시장가 매수
+        try:
+            buy = broker.create_market_buy_order(
+            symbol = code,
+            quantity = q
+            )
+            pprint.pprint(buy)
 
-sell = broker.create_limit_sell_order(
-    symbol = "TSLA",
-    price = 30,
-    quantity = 5
-)
+            return True
+        except:
+            print("매수 실패")
 
-print(buy)
-print(sell)
+            return False
+        
+    def sellMarketPrice(self, code, q):
+        #시장가 매도
+        try:
+            sell = broker.create_market_sell_order(
+                symbol = code,
+                quantity = q
+            )
+            pprint.pprint(sell)
+
+            return True
+        except:
+            print("매도 실패")
+            return False
