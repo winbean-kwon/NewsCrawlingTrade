@@ -6,7 +6,8 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import csv
 
-def searchCompany():
+
+def getCompanyName():
   chrome_options = webdriver.ChromeOptions()
   chrome_options.add_argument('window-size=1920,1080')
   driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
@@ -22,10 +23,11 @@ def searchCompany():
   driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select').click()
   driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select/option[2]').click()
 
+  company = 'test'
   i=1
   while True : 
     title_text = driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[2]/a[1]/div/div[1]').text
-    company = title_text.split('Announces')
+    company = title_text.split('Announces')[0]
     
     duplicate_check = []
 
@@ -57,3 +59,7 @@ def searchCompany():
     driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select/option[2]').click()
     sleep(1)
 
+    return company
+
+if __name__ == "__main__":
+   company = getCompanyName()
