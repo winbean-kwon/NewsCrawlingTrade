@@ -1,4 +1,9 @@
 import sys
 sys.path.append('../crawling')
 
-from nasdaq import getCompanyName
+from crawling import nasdaq
+
+def test():
+  check = nasdaq.company
+
+  return check
