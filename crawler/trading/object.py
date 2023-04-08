@@ -1,5 +1,7 @@
 import mojito
 
+
+
 f = open("trading/koreainvestment.key")
 lines = f.readlines()
 key = lines[0].strip()

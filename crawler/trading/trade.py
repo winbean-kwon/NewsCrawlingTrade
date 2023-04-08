@@ -1,7 +1,7 @@
 from object import broker
 import pprint
 
-class trBot:
+class trBot: # -> TrBot
     def __init__(self):
         print('테스트')
     
