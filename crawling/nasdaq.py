@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import csv
 
-from trading.search_symbol import check
+from trading import test
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('window-size=1920,1080')
@@ -58,4 +58,4 @@ while True :
   driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select/option[2]').click()
   sleep(1)
 
-  print(check)
+  print(test.check)

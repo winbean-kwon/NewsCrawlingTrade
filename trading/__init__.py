@@ -1,1 +1,1 @@
-from trading.search_symbol import check
+from . search_symbol import test
