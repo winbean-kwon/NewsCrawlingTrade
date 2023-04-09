@@ -1,4 +1,4 @@
-from konlpy.tag import Komoran
+from text_rank import SentenceTokenizer
 
-komoran = Komoran()
-print(komoran.morphs(u''))
+tknzr = SentenceTokenizer()
+

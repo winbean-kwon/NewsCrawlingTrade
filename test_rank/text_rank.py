@@ -7,14 +7,16 @@ from sklearn.preprocessing import normalize
 import numpy as np
 
 
-
+# 클래스는 파일 당 하나만
 class SentenceTokenizer(object):
     def __init__(self):
+        print('init')
         self.kkma = Kkma()
         self.okt = Okt()
         self.stopwords = ['중인' ,'만큼', '마찬가지', '꼬집었', "연합뉴스", "데일리", "동아일보", "중앙일보", "조선일보", "기자"
              ,"아", "휴", "아이구", "아이쿠", "아이고", "어", "나", "우리", "저희", "따라", "의해", "을", "를", "에", "의", "가",]
-    def url2sentences(self, url):
+
+    def url2sentences(self, url: str) -> list[str]:
         article = Article(url, language='ko')
         article.download()
         article.parse()
@@ -137,6 +139,7 @@ class TextRank(object):
         
         return keywords
 
+# root 로 스크립트 뺴기
 url = 'https://newsis.com/view/?id=NISX20230214_0002191728&cID=10434&pID=13200'
 textrank = TextRank(url)
 for row in textrank.summarize(3):

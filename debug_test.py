@@ -1,8 +1,7 @@
 def debug_test(debug1):
   if debug1 == '성공':
     return ("성공해")
-
-  else :
+  else:
     return ("탈락")
 
 debug1 = "맞냐"

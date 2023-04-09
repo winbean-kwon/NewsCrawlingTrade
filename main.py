@@ -1,5 +1,5 @@
+from crawler import Crawler
 
-import sys
+crawler = Crawler()
 
-print(sys.path)
-
+crawler.crawle()
