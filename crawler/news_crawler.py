@@ -6,11 +6,11 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import csv
 
-from .trading import search_test
+from .trading import search_symbol
 
 class Crawler:
     def __init__(self):
-        search_test()
+        pass
 
     def crawle(self):
         chrome_options = webdriver.ChromeOptions()
@@ -63,4 +63,4 @@ class Crawler:
             driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select/option[2]').click()
             sleep(1)
 
-            print(check)
+            print(search_symbol.test.check)

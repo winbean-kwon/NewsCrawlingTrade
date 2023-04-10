@@ -1,9 +1,8 @@
-import sys
-sys.path.append('../crawling')
+from crawler import Crawler
 
-from crawling import nasdaq
 
-def test():
-  check = nasdaq.company
+def search():
+  crawler = Crawler()
+  check = crawler.crawle().company
 
   return check

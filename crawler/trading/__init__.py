@@ -1,3 +1,1 @@
-
-def search_test():
-    print('search_test')
+from .search_symbol import test
