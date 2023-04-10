@@ -1,8 +1,6 @@
 import mojito
 
-
-
-f = open("trading/koreainvestment.key")
+f = open("../koreainvestment.key")
 lines = f.readlines()
 key = lines[0].strip()
 secret = lines[1].strip()

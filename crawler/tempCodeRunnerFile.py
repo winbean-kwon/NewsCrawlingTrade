@@ -1,1 +1,1 @@
-from trading import search_symbol
+from crawler.trading import search
