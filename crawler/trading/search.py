@@ -1,7 +1,7 @@
 import pprint
 from object import broker
 
-def searchDailyPrice(price): # search_daily_price
+def search_daily_price(price): # search_daily_price
     price = broker.fetch_ohlcv(
         symbol = "TSLA",
         timeframe='D',

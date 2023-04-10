@@ -1,6 +1,5 @@
-from crawler import Crawler, search
+from crawler import Crawler
 
 crawler = Crawler()
 
-crawler.crawle()
-print(search)
+crawler.crawle_news()
