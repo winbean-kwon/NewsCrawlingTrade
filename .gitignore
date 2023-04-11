@@ -1,3 +1,5 @@
 koreainvestment.key
 token.dat
 __pycache__/
+mypy.ini
+chromedriver
