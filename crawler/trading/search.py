@@ -1,11 +1,5 @@
-from time import sleep
 import pprint
 from object import broker
-from selenium import webdriver # module providing crawling
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
 from news_crawler import Crawler
 
@@ -13,12 +7,14 @@ class Search:
     def __init__(self):
         pass
 
-    def search_symbol(crawl_company):
-        crawl_company = Crawler.crawl_company()
+    def get_symbol(crawl_company):
+        crawl_company = Crawler.crawl_company_symbol()
 
-    def search_daily_price(price):
+    def get_daily_price(price):
+        company_symbol = Crawler.crawl_company_symbol()
+        print(company_symbol)
         price = broker.fetch_ohlcv(
-            symbol = "TSLA",
+            symbol = company_symbol,
             timeframe='D',
             adj_price=True
         )
@@ -28,10 +24,11 @@ class Search:
 
         return price
     
-    def search_now_price(price):
+    def get_now_price(price):
         #현재가 조회
         price = broker.fetch_price("TSLA")
         pprint.pprint(price)
 
         return price
 
+  
