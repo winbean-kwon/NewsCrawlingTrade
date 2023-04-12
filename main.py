@@ -1,6 +1,6 @@
-from crawler import Crawler
-from crawler import object
+from crawler import Crawler, login
 
-object.login()
+
+login.login_stock()
 crawler = Crawler()
 crawler.crawl_news()

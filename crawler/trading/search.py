@@ -1,5 +1,5 @@
 import pprint
-from object import broker
+from crawler.trading.login import broker
 
 from news_crawler import Crawler
 

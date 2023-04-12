@@ -1,6 +1,6 @@
 import mojito
 
-def login():
+def login_stock():
     f = open("crawler/trading/koreainvestment.key")
     lines = f.readlines()
     key = lines[0].strip()
@@ -16,3 +16,5 @@ def login():
     )
 
     print(broker)
+    
+    return broker

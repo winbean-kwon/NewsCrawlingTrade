@@ -1,13 +1,16 @@
 from time import sleep
 import csv
 import re
+
 from selenium import webdriver # module providing crawling
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-# from .trading import search
+from crawler.trading.trade import TradeBot
+
+
 
 class Crawler: # class providing company name & news title
     def __init__(self):
@@ -18,7 +21,7 @@ class Crawler: # class providing company name & news title
         chrome_options.add_argument('window-size=1920,1080')
         self.driver = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options=chrome_options)
         self.driver.implicitly_wait(5)
-        
+
         return self.driver
 
     def crawl_news(self): # function providing news title
@@ -77,9 +80,8 @@ class Crawler: # class providing company name & news title
         search_box.send_keys(Keys.RETURN)
         company_symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[6]/div/div/div/div[2]/div[1]/div[1]/h1').text
         symbol = re.search(r"\((.*?)\)", company_symbol).group(1)
-        
-        return symbol
-        
 
-        
-        
+        print(symbol)
+        TradeBot.order_market_price(self, symbol, 5)
+
+        return symbol
