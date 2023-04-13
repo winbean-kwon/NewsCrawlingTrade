@@ -7,26 +7,6 @@ from crawler.trading.login import login_stock
 class TradeBot:
     def __init__(self):
         print('테스트')
-    
-    def login(self):
-        #증권사 로그인
-        f = open("crawler/trading/koreainvestment.key")
-        lines = f.readlines()
-        key = lines[0].strip()
-        secret = lines[1].strip()
-        acc_no = lines[2].strip()
-        f.close()
-
-        broker = mojito.KoreaInvestment(
-            api_key = key,
-            api_secret = secret,
-            acc_no = acc_no,
-            exchange='나스닥'
-        )
-
-        print(broker)
-        
-        return broker
 
     def order_market_price(self, code, order_quantity):
         #시장가 매수

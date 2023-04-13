@@ -7,6 +7,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from crawler.trading.trade import TradeBot
 
@@ -23,6 +26,17 @@ class Crawler: # class providing company name & news title
         self.driver.implicitly_wait(5)
 
         return self.driver
+    
+    def find_element_with_retry(driver, xpath, max_retries=3, wait_time=5):
+        retries = 0
+        while retries < max_retries:
+            try:
+                element = WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.XPATH, xpath)))
+                return element
+            except NoSuchElementException:
+                print(f"Element not found. Retrying... (Attempt {retries + 1} of {max_retries})")
+                retries += 1
+        raise NoSuchElementException(f"Element not found after {max_retries} retries.")
 
     def crawl_news(self): # function providing news title
         self.crawl_settings()
