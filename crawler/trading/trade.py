@@ -1,5 +1,6 @@
-import pprint
 import mojito
+import pprint
+
 
 from crawler.trading.login import login_stock
 
@@ -29,6 +30,7 @@ class TradeBot:
                 quantity = sell_quantity
             )
             pprint.pprint(sell)
+            print("매도 성공")
 
             return True
 

@@ -26,29 +26,23 @@ class Crawler: # class providing company name & news title
         self.driver.implicitly_wait(5)
 
         return self.driver
-    
-    def find_element_with_retry(driver, xpath, max_retries=3, wait_time=5):
-        retries = 0
-        while retries < max_retries:
-            try:
-                element = WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.XPATH, xpath)))
-                return element
-            except NoSuchElementException:
-                print(f"Element not found. Retrying... (Attempt {retries + 1} of {max_retries})")
-                retries += 1
-        raise NoSuchElementException(f"Element not found after {max_retries} retries.")
 
     def crawl_news(self): # function providing news title
+        user_input = input("원하는 검색어를 입력하세요: ")
+
+        if user_input == '':
+            user_input = "direct offer" # 테스트 할때만 사용
+
         self.crawl_settings()
         self.driver.get(url='https://www.nasdaq.com/')
         sleep(5)
         search_box = self.driver.find_element(By.XPATH, '/html/body/div[3]/div/main/div[2]/article/div/div[2]/div[2]/aside/nsdq-right-rail-desktop/div/div[1]/div/div[1]/form/div/div[2]/input')
-        search_box.send_keys('direct offer')
+        search_box.send_keys(user_input)
         search_box.send_keys(Keys.RETURN)
         self.driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select').click()
         self.driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[1]/span[2]/select/option[2]').click()
 
-        i=1
+        count_duplicate = 1
 
         while True:
             title_text = self.driver.find_element(By.XPATH, '/html/body/div[2]/div/main/div[2]/div[3]/div/section/div[2]/div[3]/div[3]/div[2]/a[1]/div/div[1]').text
@@ -66,15 +60,15 @@ class Crawler: # class providing company name & news title
                 self.crawl_company_symbol(title_text)
 
             else:
-                print('same news', i)
-                i += 1
+                print('same news', count_duplicate)
+                count_duplicate += 1
 
             sleep(3)
             self.driver.get(url='https://www.nasdaq.com/')
             sleep(5)
             search_box = self.driver.find_element(By.XPATH, '/html/body/div[3]/div/main/div[2]/article/div/div[2]/div[2]/aside/nsdq-right-rail-desktop/div/div[1]/div/div[1]/form/div/div[2]/input')
             sleep(1)
-            search_box.send_keys('direct offer')
+            search_box.send_keys(user_input)
             sleep(1)
             search_box.send_keys(Keys.RETURN)
             sleep(1)
@@ -86,14 +80,21 @@ class Crawler: # class providing company name & news title
     def crawl_company_symbol(self, title_text): # function providing company symbol
         company = title_text.split('Announces')[0]
         self.crawl_settings()
-        self.driver.get(url='https://finance.yahoo.com/')
-        sleep(5)
-        search_box = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[1]/div[1]/div/div/div[1]/div/div/div/div[1]/div/div[2]/div/form/input[1]')
-        search_box.send_keys(company)
-        sleep(3)
-        search_box.send_keys(Keys.RETURN)
-        company_symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[6]/div/div/div/div[2]/div[1]/div[1]/h1').text
-        symbol = re.search(r"\((.*?)\)", company_symbol).group(1)
+        while True:
+            try:
+                self.driver.get(url='https://finance.yahoo.com/')
+                sleep(5)
+                search_box = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[1]/div[1]/div/div/div[1]/div/div/div/div[1]/div/div[2]/div/form/input[1]')
+                search_box.send_keys(company)
+                sleep(3)
+                search_box.send_keys(Keys.RETURN)
+                company_symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[6]/div/div/div/div[2]/div[1]/div[1]/h1').text
+                symbol = re.search(r"\((.*?)\)", company_symbol).group(1)
+                break
+
+            except NoSuchElementException:
+                symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[4]/div/div/main/div/div/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').text
+                break
 
         print(symbol)
         TradeBot.order_market_price(self, symbol, 5)
