@@ -28,10 +28,7 @@ class Crawler: # class providing company name & news title
         return self.driver
 
     def crawl_news(self): # function providing news title
-        user_input = input("원하는 검색어를 입력하세요: ")
-
-        if user_input == '':
-            user_input = "direct offer" # 테스트 할때만 사용
+        user_input = "direct offer"
 
         self.crawl_settings()
         self.driver.get(url='https://www.nasdaq.com/')
@@ -93,8 +90,11 @@ class Crawler: # class providing company name & news title
                 break
 
             except NoSuchElementException:
-                symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[4]/div/div/main/div/div/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').text
-                break
+                try:
+                    symbol = self.driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[4]/div/div/main/div/div/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').text
+                
+                except NoSuchElementException:
+                    self.crawl_news()
 
         print(symbol)
         TradeBot.order_market_price(self, symbol, 5)

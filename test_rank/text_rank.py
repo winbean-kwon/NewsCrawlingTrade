@@ -6,6 +6,14 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import normalize
 import numpy as np
 
+# 참고
+# https://hoonzi-text.tistory.com/68
+# https://lovit.github.io/nlp/2019/04/30/textrank/
+# https://cosmosproject.tistory.com/368
+# https://excelsior-cjh.tistory.com/93
+# https://desarraigado.tistory.com/25
+# https://datascienceschool.net/03%20machine%20learning/03.01.03%20Scikit-Learn%EC%9D%98%20%EB%AC%B8%EC%84%9C%20%EC%A0%84%EC%B2%98%EB%A6%AC%20%EA%B8%B0%EB%8A%A5.html
+
 
 # 클래스는 파일 당 하나만
 class SentenceTokenizer(object):
