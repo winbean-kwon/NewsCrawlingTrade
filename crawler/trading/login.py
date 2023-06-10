@@ -1,7 +1,7 @@
 import mojito
 
 def login_stock():
-    f = open("crawler/trading/koreainvestment.key")
+    f = open("../../trading/koreainvestment.key")
     lines = f.readlines()
     key = lines[0].strip()
     secret = lines[1].strip()
